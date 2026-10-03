@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мамочка, прости меня! 🥺</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffe5ec, #ffc2d1);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+            transition: all 0.5s ease;
+        }
+
+        h1 {
+            color: #ff477e;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #6c757d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #ff7096;
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+        }
+
+        /* Зона для кнопок без фона, чтобы выглядело чисто */
+        .buttons-container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.02); 
+            border-radius: 16px;
+            height: 220px; 
+            margin-top: 20px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 12px 35px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        /* Кнопка ДА жестко закреплена слева сверху в этой зоне */
+        #yesBtn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background-color: #ff477e;
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 71, 126, 0.4);
+            transition: transform 0.1s ease, background-color 0.2s;
+            z-index: 10;
+        }
+
+        #yesBtn:hover {
+            background-color: #ff5c8a;
+            transform: scale(1.05);
+        }
+
+        /* Кнопка НЕТ изначально стоит справа сверху */
+        #noBtn {
+            background-color: #6c757d;
+            color: white;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            transition: all 0.12s ease-out;
+            touch-action: none; 
+            z-index: 5;
+        }
+
+        /* Экран успеха */
+        .hidden {
+            display: none !important;
+        }
+
+        .success-hearts {
+            position: absolute;
+            font-size: 24px;
+            animation: floatUp 3s linear infinite;
+            opacity: 0;
+            bottom: -10%;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="mainCard">
+        <h1>Мамочка, прости меня, пожалуйста! 🥺</h1>
+        <p>Я очень сильно люблю тебя и обещаю, что впредь буду гораздо более внимательным к твоим словам, чувствам и просьбам. Мне очень жаль, что так получилось...</p>
+        <h2>Ты прощаешь меня?</h2>
+        
+        <div class="buttons-container" id="area">
+            <button id="yesBtn">Да 💖</button>
+            <button id="noBtn">Нет</button>
+        </div>
+    </div>
+
+    <div class="card hidden" id="successCard">
+        <h1>Ура! Спасибо, мамочка! 🎉</h1>
+        <p style="font-size: 1.3rem; color: #ff477e; font-weight: bold;">
+            Обещаю тебя больше не расстраивать. Я тебя очень люблю! ❤️
+        </p>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        const mainCard = document.getElementById('mainCard');
+        const successCard = document.getElementById('successCard');
+        const area = document.getElementById('area');
+
+        function escapeButton() {
+            const areaWidth = area.clientWidth;
+            const areaHeight = area.clientHeight;
+
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+
+            // Координаты и размеры кнопки "Да" относительно контейнера
+            const yesLeft = yesBtn.offsetLeft;
+            const yesTop = yesBtn.offsetTop;
+            const yesWidth = yesBtn.offsetWidth;
+            const yesHeight = yesBtn.offsetHeight;
+
+            let randomX, randomY;
+            let attempts = 0;
+            let isOverlapping = true;
+
+            // Безопасный отступ вокруг кнопки "Да" (в пикселях)
+            const padding = 15;
+
+            // Запускаем цикл подбора координат, пока не найдем место без пересечения
+            while (isOverlapping && attempts < 100) {
+                const maxX = areaWidth - btnWidth - 10;
+                const maxY = areaHeight - btnHeight - 10;
+
+                randomX = Math.max(10, Math.random() * maxX);
+                randomY = Math.max(10, Math.random() * maxY);
+
+                // Проверяем геометрическое пересечение с кнопкой "Да" (+ учитываем отступ)
+                const overlapX = randomX + btnWidth >= yesLeft - padding && randomX <= yesLeft + yesWidth + padding;
+                const overlapY = randomY + btnHeight >= yesTop - padding && randomY <= yesTop + yesHeight + padding;
+
+                if (!(overlapX && overlapY)) {
+                    isOverlapping = false; // Пересечения нет, выходим из цикла
+                }
+                attempts++;
+            }
+
+            // Применяем новые «безопасные» координаты
+            noBtn.style.right = 'auto';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+        }
+
+        // Отслеживаем наведение и касания
+        noBtn.addEventListener('mouseenter', escapeButton);
+        noBtn.addEventListener('mouseover', escapeButton);
+        noBtn.addEventListener('touchstart', function(e) {
+            e.preventDefault(); 
+            escapeButton();
+        });
+
+        // Клик на кнопку Да
+        yesBtn.addEventListener('click', () => {
+            mainCard.classList.add('hidden');
+            successCard.classList.remove('hidden');
+            startHeartsAnimation();
+        });
+
+        // Анимация сердечек
+        function startHeartsAnimation() {
+            const hearts = ['❤️', '💖', '💝', '💕', '🌷', '✨'];
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('success-hearts');
+                heart.innerText = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                heart.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                document.body.appendChild(heart);
+
+                setTimeout(() => {
+                    heart.remove();
+                }, 3000);
+            }, 150);
+        }
+    </script>
+</body>
+</html>
